@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function MapPage() {
   const incidents = await prisma.incident.findMany({
     orderBy: { createdAt: "desc" },
+    include: { reportedBy: true },
   });
 
   // Fire risk depends on current weather at each incident's location, so it's

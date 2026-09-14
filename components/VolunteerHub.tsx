@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 type Action = {
   id: string;
@@ -8,7 +9,7 @@ type Action = {
   description: string;
   location: string;
   neededSkills: string | null;
-  createdBy: { name: string };
+  createdBy: { name: string; didIdentifier: string | null };
   signups: { id: string }[];
 };
 
@@ -53,6 +54,7 @@ export default function VolunteerHub() {
             {a.neededSkills && <p style={{ fontSize: "0.85rem" }}>🛠 {a.neededSkills}</p>}
             <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
               {a.signups.length} volunteer(s) signed up · by {a.createdBy.name}
+              <VerifiedBadge didIdentifier={a.createdBy.didIdentifier} />
             </p>
             {signupFor === a.id ? (
               <SignupForm

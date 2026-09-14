@@ -131,6 +131,37 @@ form select {
 .risk-HIGH { background: #ffe3e3; color: #c92a2a; }
 .risk-UNKNOWN { background: #e9ecef; color: #495057; }
 
+.verified-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-left: 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #e7f5ff;
+  color: #1864ab;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+  color: var(--smoke);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
 .hero {
   text-align: center;
   padding: 48px 0;

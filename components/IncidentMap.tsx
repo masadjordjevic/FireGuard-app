@@ -3,6 +3,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 // Fix default marker icons (Next.js/webpack doesn't resolve Leaflet's default asset paths)
 const icon = L.icon({
@@ -22,6 +23,7 @@ type Incident = {
   longitude: number;
   status: string;
   riskLevel?: RiskLevel;
+  reportedBy?: { name: string; didIdentifier: string | null };
 };
 
 export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
@@ -44,6 +46,12 @@ export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
               <span className={`status-badge risk-${inc.riskLevel}`}>Risk: {inc.riskLevel}</span>
             )}
             <p style={{ marginTop: 6 }}>{inc.description}</p>
+            {inc.reportedBy && (
+              <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
+                Reported by {inc.reportedBy.name}
+                <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
+              </p>
+            )}
           </Popup>
         </Marker>
       ))}

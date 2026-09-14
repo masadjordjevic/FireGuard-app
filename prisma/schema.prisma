@@ -23,6 +23,12 @@ model User {
   role          String   @default("CITIZEN")
   reputation    Int      @default(0)
   walletAddress String?
+  // MVP-only Decentralized Identity field: a self-reported DID string (e.g.
+  // "did:ethr:0x..." or "did:ens:name.eth"). Presence of this field is used as
+  // a stand-in "Verified" signal in the UI. It is NOT cryptographically
+  // checked — see lib/did.ts for the production note on wiring in a real
+  // DID resolver (e.g. ethr-did / did-resolver, or ENS resolution).
+  didIdentifier String?
   createdAt     DateTime @default(now())
 
   incidents       Incident[]        @relation("ReportedBy")
