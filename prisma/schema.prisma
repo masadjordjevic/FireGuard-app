@@ -1,0 +1,113 @@
+// FireGuard - Prisma schema
+// Dev: SQLite. Za produkciju promeni provider na "postgresql" i DATABASE_URL u .env
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: SQLite (the Prisma connector used here) does not support native enums,
+// so status/role are plain strings. Valid values are enforced by the Zod schemas
+// in the API routes:
+//   IncidentStatus: REPORTED | VERIFIED | CONTAINED | RESOLVED | FALSE_ALARM
+//   UserRole:       CITIZEN | VOLUNTEER | EMERGENCY_SERVICE | NGO | LOCAL_AUTHORITY | DONOR | VALIDATOR
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  role          String   @default("CITIZEN")
+  reputation    Int      @default(0)
+  walletAddress String?
+  createdAt     DateTime @default(now())
+
+  incidents       Incident[]        @relation("ReportedBy")
+  confirmations   Confirmation[]
+  actions         VolunteerAction[] @relation("CreatedBy")
+  signups         VolunteerSignup[]
+  donations       Donation[]
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  latitude    Float
+  longitude   Float
+  evidenceUrl String?
+  status      String   @default("REPORTED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reportedBy   User   @relation("ReportedBy", fields: [reportedById], references: [id])
+  reportedById String
+
+  confirmations Confirmation[]
+}
+
+// Community/validator confirmations of an incident (reputation mechanism)
+model Confirmation {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  trustLevel Int      @default(1) // higher for emergency services / validators
+
+  incident   Incident @relation(fields: [incidentId], references: [id])
+  incidentId String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+}
+
+model VolunteerAction {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  location    String
+  neededSkills String?
+  startsAt    DateTime?
+  createdAt   DateTime @default(now())
+
+  createdBy   User   @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById String
+
+  signups VolunteerSignup[]
+}
+
+model VolunteerSignup {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  skills    String?
+  available String?
+
+  action   VolunteerAction @relation(fields: [actionId], references: [id])
+  actionId String
+  user     User            @relation(fields: [userId], references: [id])
+  userId   String
+}
+
+model DonationCampaign {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  goalEth         Float
+  contractAddress String? // deployed DonationCampaign.sol address on Sepolia
+  createdAt       DateTime @default(now())
+
+  donations Donation[]
+}
+
+// Local mirror of on-chain donations (indexed from contract events / tx hash)
+model Donation {
+  id           String   @id @default(cuid())
+  amountEth    Float
+  txHash       String   @unique
+  createdAt    DateTime @default(now())
+
+  campaign   DonationCampaign @relation(fields: [campaignId], references: [id])
+  campaignId String
+  donor      User?            @relation(fields: [donorId], references: [id])
+  donorId    String?
+}
