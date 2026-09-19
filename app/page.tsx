@@ -13,25 +13,25 @@ export default function Home() {
 
       <div className="grid">
         <Link href="/report" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3>🔥 Report a Fire</h3>
+          <h3> Report a Fire</h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Submit location, description and evidence for a new incident.
           </p>
         </Link>
         <Link href="/map" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3>🗺️ Incident Map</h3>
+          <h3> Incident Map</h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             View active and verified incidents near you.
           </p>
         </Link>
         <Link href="/volunteers" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3>🤝 Volunteer Hub</h3>
+          <h3> Volunteer Hub</h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Create or join community response actions.
           </p>
         </Link>
         <Link href="/donate" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3>💛 Donate</h3>
+          <h3> Donate</h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Transparent, blockchain-tracked donations on Sepolia testnet.
           </p>

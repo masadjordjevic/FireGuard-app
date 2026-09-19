@@ -9,11 +9,14 @@ async function main() {
 
   const contract = await DonationCampaign.deploy(campaignName, goalWei);
   await contract.waitForDeployment();
+  const receipt = await contract.deploymentTransaction().wait();
 
   console.log(`DonationCampaign "${campaignName}" deployed to:`, await contract.getAddress());
   console.log("Goal:", goalEth, "ETH");
-  console.log("\nSave this address into DonationCampaign.contractAddress in your database,");
-  console.log("or set NEXT_PUBLIC_DONATION_CONTRACT_ADDRESS in .env for the frontend.");
+  console.log("Deployed in block:", receipt.blockNumber);
+  console.log("\nSet these in .env so the frontend and donation indexer can find the contract:");
+  console.log(`  NEXT_PUBLIC_DONATION_CONTRACT_ADDRESS="${await contract.getAddress()}"`);
+  console.log(`  DONATION_CONTRACT_DEPLOY_BLOCK="${receipt.blockNumber}"`);
 }
 
 main().catch((error) => {

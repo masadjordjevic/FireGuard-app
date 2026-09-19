@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import AdminIncidentsTable from "@/components/AdminIncidentsTable";
+import AdminSyncDonationsButton from "@/components/AdminSyncDonationsButton";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { publicUserSelect } from "@/lib/publicUser";
 
 // Always show current data, never a statically cached snapshot
 export const dynamic = "force-dynamic";
@@ -12,18 +14,19 @@ export default async function AdminPage() {
   const [incidents, actions, donations, users] = await Promise.all([
     prisma.incident.findMany({
       orderBy: { createdAt: "desc" },
-      include: { reportedBy: true },
+      include: { reportedBy: { select: publicUserSelect } },
     }),
     prisma.volunteerAction.findMany({
       orderBy: { createdAt: "desc" },
-      include: { createdBy: true, signups: true },
+      include: { createdBy: { select: publicUserSelect }, signups: true },
     }),
     prisma.donation.findMany({
       orderBy: { createdAt: "desc" },
-      include: { campaign: true, donor: true },
+      include: { campaign: true, donor: { select: publicUserSelect } },
     }),
     prisma.user.findMany({
       orderBy: { reputation: "desc" },
+      select: publicUserSelect,
     }),
   ]);
 
@@ -74,7 +77,10 @@ export default async function AdminPage() {
       </section>
 
       <section className="card">
-        <h2>Donations ({donations.length})</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h2>Donations ({donations.length})</h2>
+          <AdminSyncDonationsButton />
+        </div>
         <table className="admin-table">
           <thead>
             <tr>
@@ -102,8 +108,8 @@ export default async function AdminPage() {
             {donations.length === 0 && (
               <tr>
                 <td colSpan={5} style={{ color: "var(--smoke)" }}>
-                  No donations recorded yet. The Donate page currently sends ETH straight to the
-                  smart contract and doesn't write a Donation row here yet.
+                  No donations indexed yet. Donations are recorded here by the on-chain indexer
+                  (see README) — use "Sync from chain" above to pull them in manually.
                 </td>
               </tr>
             )}

@@ -1,9 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import VerifiedBadge from "@/components/VerifiedBadge";
+
+const HIGH_TRUST_ROLES = ["EMERGENCY_SERVICE", "VALIDATOR"];
 
 // Fix default marker icons (Next.js/webpack doesn't resolve Leaflet's default asset paths)
 const icon = L.icon({
@@ -52,9 +57,50 @@ export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
                 <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
               </p>
             )}
+            <ConfirmButton incidentId={inc.id} />
           </Popup>
         </Marker>
       ))}
     </MapContainer>
+  );
+}
+
+function ConfirmButton({ incidentId }: { incidentId: string }) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!session || !HIGH_TRUST_ROLES.includes(session.user.role)) return null;
+
+  async function handleConfirm() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/incidents/${incidentId}/confirm`, { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Failed to confirm incident");
+      }
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button
+        className="btn"
+        style={{ padding: "4px 10px", fontSize: "0.8rem" }}
+        onClick={handleConfirm}
+        disabled={loading}
+      >
+        {loading ? "Confirming..." : "Confirm as verified"}
+      </button>
+      {error && <p style={{ color: "crimson", fontSize: "0.8rem" }}>{error}</p>}
+    </div>
   );
 }

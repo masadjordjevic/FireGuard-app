@@ -1,6 +1,7 @@
 import nextDynamic from "next/dynamic";
 import { prisma } from "@/lib/prisma";
 import { assessFireRisk } from "@/lib/riskAssessment";
+import { publicUserSelect } from "@/lib/publicUser";
 
 // Leaflet touches `window`, so the map must be loaded client-side only
 const IncidentMap = nextDynamic(() => import("@/components/IncidentMap"), { ssr: false });
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function MapPage() {
   const incidents = await prisma.incident.findMany({
     orderBy: { createdAt: "desc" },
-    include: { reportedBy: true },
+    include: { reportedBy: { select: publicUserSelect } },
   });
 
   // Fire risk depends on current weather at each incident's location, so it's

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { publicUserSelect } from "@/lib/publicUser";
 
 const ActionInput = z.object({
   title: z.string().min(3),
@@ -8,37 +11,34 @@ const ActionInput = z.object({
   location: z.string().min(2),
   neededSkills: z.string().optional(),
   startsAt: z.string().optional(), // ISO date string
-  creatorName: z.string().min(1),
-  creatorEmail: z.string().email(),
 });
 
 export async function GET() {
   const actions = await prisma.volunteerAction.findMany({
     orderBy: { createdAt: "desc" },
-    include: { createdBy: true, signups: true },
+    include: { createdBy: { select: publicUserSelect }, signups: true },
   });
   return NextResponse.json(actions);
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "You must be logged in to create a volunteer action" }, { status: 401 });
+  }
+
   const body = await req.json();
   const parsed = ActionInput.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { creatorName, creatorEmail, startsAt, ...data } = parsed.data;
-
-  const creator = await prisma.user.upsert({
-    where: { email: creatorEmail },
-    update: {},
-    create: { name: creatorName, email: creatorEmail, role: "VOLUNTEER" },
-  });
+  const { startsAt, ...data } = parsed.data;
 
   const action = await prisma.volunteerAction.create({
     data: {
       ...data,
       startsAt: startsAt ? new Date(startsAt) : null,
-      createdById: creator.id,
+      createdById: session.user.id,
     },
   });
 

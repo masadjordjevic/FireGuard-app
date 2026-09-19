@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import VerifiedBadge from "@/components/VerifiedBadge";
 
 type Action = {
@@ -14,6 +16,7 @@ type Action = {
 };
 
 export default function VolunteerHub() {
+  const { data: session } = useSession();
   const [actions, setActions] = useState<Action[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [signupFor, setSignupFor] = useState<string | null>(null);
@@ -31,9 +34,15 @@ export default function VolunteerHub() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Volunteer Hub</h1>
-        <button className="btn" onClick={() => setShowForm((s) => !s)}>
-          {showForm ? "Cancel" : "+ New action"}
-        </button>
+        {session ? (
+          <button className="btn" onClick={() => setShowForm((s) => !s)}>
+            {showForm ? "Cancel" : "+ New action"}
+          </button>
+        ) : (
+          <Link href="/login" className="btn" style={{ textDecoration: "none" }}>
+            Log in to create an action
+          </Link>
+        )}
       </div>
 
       {showForm && (
@@ -56,7 +65,11 @@ export default function VolunteerHub() {
               {a.signups.length} volunteer(s) signed up · by {a.createdBy.name}
               <VerifiedBadge didIdentifier={a.createdBy.didIdentifier} />
             </p>
-            {signupFor === a.id ? (
+            {!session ? (
+              <Link href="/login" style={{ fontSize: "0.85rem" }}>
+                Log in to sign up
+              </Link>
+            ) : signupFor === a.id ? (
               <SignupForm
                 actionId={a.id}
                 onDone={() => {
@@ -83,10 +96,9 @@ function NewActionForm({ onCreated }: { onCreated: () => void }) {
     description: "",
     location: "",
     neededSkills: "",
-    creatorName: "",
-    creatorEmail: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -95,13 +107,23 @@ function NewActionForm({ onCreated }: { onCreated: () => void }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await fetch("/api/volunteer-actions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    setLoading(false);
-    onCreated();
+    setError(null);
+    try {
+      const res = await fetch("/api/volunteer-actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(typeof data.error === "string" ? data.error : "Failed to create action");
+      }
+      onCreated();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -122,14 +144,7 @@ function NewActionForm({ onCreated }: { onCreated: () => void }) {
         Needed skills (optional)
         <input value={form.neededSkills} onChange={(e) => update("neededSkills", e.target.value)} />
       </label>
-      <label>
-        Your name
-        <input required value={form.creatorName} onChange={(e) => update("creatorName", e.target.value)} />
-      </label>
-      <label>
-        Your email
-        <input required type="email" value={form.creatorEmail} onChange={(e) => update("creatorEmail", e.target.value)} />
-      </label>
+      {error && <p style={{ color: "crimson" }}>{error}</p>}
       <button className="btn" disabled={loading} type="submit">
         {loading ? "Creating..." : "Create action"}
       </button>
@@ -138,8 +153,9 @@ function NewActionForm({ onCreated }: { onCreated: () => void }) {
 }
 
 function SignupForm({ actionId, onDone }: { actionId: string; onDone: () => void }) {
-  const [form, setForm] = useState({ name: "", email: "", skills: "", available: "" });
+  const [form, setForm] = useState({ skills: "", available: "" });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -148,29 +164,32 @@ function SignupForm({ actionId, onDone }: { actionId: string; onDone: () => void
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await fetch(`/api/volunteer-actions/${actionId}/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    setLoading(false);
-    onDone();
+    setError(null);
+    try {
+      const res = await fetch(`/api/volunteer-actions/${actionId}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(typeof data.error === "string" ? data.error : "Failed to sign up");
+      }
+      onDone();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <form onSubmit={submit} style={{ marginTop: 10 }}>
       <label>
-        Name
-        <input required value={form.name} onChange={(e) => update("name", e.target.value)} />
-      </label>
-      <label>
-        Email
-        <input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} />
-      </label>
-      <label>
         Skills / availability (optional)
         <input value={form.skills} onChange={(e) => update("skills", e.target.value)} />
       </label>
+      {error && <p style={{ color: "crimson" }}>{error}</p>}
       <button className="btn" disabled={loading} type="submit">
         {loading ? "Signing up..." : "Confirm signup"}
       </button>

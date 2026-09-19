@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { publicUserSelect } from "@/lib/publicUser";
 
 const IncidentInput = z.object({
   title: z.string().min(3),
@@ -15,7 +16,7 @@ const IncidentInput = z.object({
 export async function GET() {
   const incidents = await prisma.incident.findMany({
     orderBy: { createdAt: "desc" },
-    include: { reportedBy: true, confirmations: true },
+    include: { reportedBy: { select: publicUserSelect }, confirmations: true },
   });
   return NextResponse.json(incidents);
 }

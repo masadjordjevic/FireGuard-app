@@ -1,42 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import VerifiedBadge from "@/components/VerifiedBadge";
 
-const EMAIL_STORAGE_KEY = "fireguard_profile_email";
-
-type Status = "idle" | "loading" | "saving" | "loaded" | "not-found" | "error";
+type Status = "idle" | "loading" | "saving" | "loaded" | "error";
 
 export default function ProfilePage() {
+  const { data: session, status: sessionStatus } = useSession();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("");
   const [didIdentifier, setDidIdentifier] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(EMAIL_STORAGE_KEY);
-    if (saved) {
-      setEmail(saved);
-      loadProfile(saved);
-    }
+    if (sessionStatus === "authenticated") loadProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sessionStatus]);
 
-  async function loadProfile(lookupEmail: string) {
+  async function loadProfile() {
     setStatus("loading");
     setError(null);
     try {
-      const res = await fetch(`/api/users?email=${encodeURIComponent(lookupEmail)}`);
-      if (res.status === 404) {
-        setName("");
-        setDidIdentifier("");
-        setStatus("not-found");
-        return;
-      }
+      const res = await fetch("/api/users/me");
       if (!res.ok) throw new Error("Failed to load profile");
       const user = await res.json();
+      setEmail(user.email);
       setName(user.name);
+      setRole(user.role);
       setDidIdentifier(user.didIdentifier ?? "");
       setStatus("loaded");
     } catch (err: any) {
@@ -45,26 +39,20 @@ export default function ProfilePage() {
     }
   }
 
-  async function handleLookup(e: React.FormEvent) {
-    e.preventDefault();
-    if (email) await loadProfile(email);
-  }
-
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setStatus("saving");
     setError(null);
     try {
-      const res = await fetch("/api/users", {
+      const res = await fetch("/api/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, didIdentifier }),
+        body: JSON.stringify({ name, didIdentifier }),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(JSON.stringify(data.error ?? "Failed to save profile"));
       }
-      localStorage.setItem(EMAIL_STORAGE_KEY, email);
       setStatus("loaded");
     } catch (err: any) {
       setError(err.message);
@@ -72,31 +60,39 @@ export default function ProfilePage() {
     }
   }
 
+  if (sessionStatus === "loading") {
+    return <p style={{ color: "var(--smoke)" }}>Loading...</p>;
+  }
+
+  if (sessionStatus === "unauthenticated") {
+    return (
+      <div className="card" style={{ maxWidth: 480, margin: "0 auto" }}>
+        <h1>My Profile</h1>
+        <p style={{ color: "var(--smoke)" }}>
+          You need to be logged in to view or edit your profile.{" "}
+          <Link href="/login">Log in</Link> or <Link href="/register">create an account</Link>.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="card" style={{ maxWidth: 560, margin: "0 auto" }}>
       <h1>My Profile</h1>
       <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
-        FireGuard has no login yet, so profiles are looked up by email. Add your Decentralized
-        Identifier (DID) below to show a "Verified" badge next to your name across the app.
+        Add your Decentralized Identifier (DID) below to show a "Verified" badge next to your name
+        across the app.
       </p>
 
-      <form onSubmit={handleLookup} style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-        <label style={{ flex: 1 }}>
-          Email
-          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </label>
-        <button className="btn" type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "Looking up..." : "Look up"}
-        </button>
-      </form>
-
-      {status === "not-found" && (
-        <p style={{ color: "var(--smoke)", fontSize: "0.85rem" }}>
-          No profile found for this email yet — fill in the details below and save to create one.
-        </p>
-      )}
-
       <form onSubmit={handleSave} style={{ marginTop: 16 }}>
+        <label>
+          Email
+          <input value={email} disabled />
+        </label>
+        <label>
+          Role
+          <input value={role} disabled />
+        </label>
         <label>
           Name
           <input required value={name} onChange={(e) => setName(e.target.value)} />
@@ -113,7 +109,7 @@ export default function ProfilePage() {
           Status: {didIdentifier ? <VerifiedBadge didIdentifier={didIdentifier} /> : "Not verified"}
         </p>
         {error && <p style={{ color: "crimson" }}>{error}</p>}
-        <button className="btn" type="submit" disabled={status === "saving" || !email}>
+        <button className="btn" type="submit" disabled={status === "saving" || status === "loading"}>
           {status === "saving" ? "Saving..." : "Save profile"}
         </button>
       </form>

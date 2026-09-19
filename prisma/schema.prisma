@@ -20,6 +20,11 @@ model User {
   id            String   @id @default(cuid())
   name          String
   email         String   @unique
+  // Hashed (bcrypt) password for NextAuth Credentials login. Null for
+  // "shadow" accounts created by the anonymous flows (reporting a fire,
+  // signing up to volunteer) that never registered — those can't log in
+  // until they register with this same email, which upgrades the record.
+  password      String?
   role          String   @default("CITIZEN")
   reputation    Int      @default(0)
   walletAddress String?
@@ -100,6 +105,10 @@ model DonationCampaign {
   description     String
   goalEth         Float
   contractAddress String? // deployed DonationCampaign.sol address on Sepolia
+  // Last block number scanned for DonationReceived events by the indexer
+  // (lib/donationIndexer.ts / scripts/sync-donations.js). Lets a re-run pick
+  // up where it left off instead of re-scanning the whole chain history.
+  lastSyncedBlock Int?
   createdAt       DateTime @default(now())
 
   donations Donation[]
