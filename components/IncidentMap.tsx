@@ -1,14 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import VerifiedBadge from "@/components/VerifiedBadge";
-
-const HIGH_TRUST_ROLES = ["EMERGENCY_SERVICE", "VALIDATOR"];
 
 // Fix default marker icons (Next.js/webpack doesn't resolve Leaflet's default asset paths)
 const icon = L.icon({
@@ -23,15 +18,14 @@ type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN";
 type Incident = {
   id: string;
   title: string;
-  description: string;
   latitude: number;
   longitude: number;
   status: string;
   riskLevel?: RiskLevel;
-  reportedBy?: { name: string; didIdentifier: string | null };
 };
 
 export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
+  const router = useRouter();
   const center: [number, number] =
     incidents.length > 0 ? [incidents[0].latitude, incidents[0].longitude] : [44.7866, 20.4489]; // default: Belgrade
 
@@ -42,65 +36,18 @@ export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {incidents.map((inc) => (
-        <Marker key={inc.id} position={[inc.latitude, inc.longitude]} icon={icon}>
-          <Popup>
-            <strong>{inc.title}</strong>
-            <br />
-            <span className={`status-badge status-${inc.status}`}>{inc.status}</span>{" "}
-            {inc.riskLevel && (
-              <span className={`status-badge risk-${inc.riskLevel}`}>Risk: {inc.riskLevel}</span>
-            )}
-            <p style={{ marginTop: 6 }}>{inc.description}</p>
-            {inc.reportedBy && (
-              <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
-                Reported by {inc.reportedBy.name}
-                <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
-              </p>
-            )}
-            <ConfirmButton incidentId={inc.id} />
-          </Popup>
+        <Marker
+          key={inc.id}
+          position={[inc.latitude, inc.longitude]}
+          icon={icon}
+          eventHandlers={{ click: () => router.push(`/incidents/${inc.id}`) }}
+        >
+          <Tooltip>
+            {inc.title} — {inc.status}
+            {inc.riskLevel && ` — Risk: ${inc.riskLevel}`}
+          </Tooltip>
         </Marker>
       ))}
     </MapContainer>
-  );
-}
-
-function ConfirmButton({ incidentId }: { incidentId: string }) {
-  const { data: session } = useSession();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  if (!session || !HIGH_TRUST_ROLES.includes(session.user.role)) return null;
-
-  async function handleConfirm() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/incidents/${incidentId}/confirm`, { method: "POST" });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to confirm incident");
-      }
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div style={{ marginTop: 8 }}>
-      <button
-        className="btn"
-        style={{ padding: "4px 10px", fontSize: "0.8rem" }}
-        onClick={handleConfirm}
-        disabled={loading}
-      >
-        {loading ? "Confirming..." : "Confirm as verified"}
-      </button>
-      {error && <p style={{ color: "crimson", fontSize: "0.8rem" }}>{error}</p>}
-    </div>
   );
 }

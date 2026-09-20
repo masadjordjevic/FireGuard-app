@@ -12,8 +12,9 @@ datasource db {
 
 // NOTE: SQLite (the Prisma connector used here) does not support native enums,
 // so status/role are plain strings. Valid values are enforced by the Zod schemas
-// in the API routes:
-//   IncidentStatus: REPORTED | VERIFIED | CONTAINED | RESOLVED | FALSE_ALARM
+// in the API routes (see lib/incidentEnums.ts for status/dangerLevel):
+//   IncidentStatus: REPORTED | VERIFIED | ACTIVE | RESOLVED
+//   DangerLevel:    LOW | MODERATE | HIGH | EXTREME
 //   UserRole:       CITIZEN | VOLUNTEER | EMERGENCY_SERVICE | NGO | LOCAL_AUTHORITY | DONOR | VALIDATOR
 
 model User {
@@ -50,6 +51,11 @@ model Incident {
   latitude    Float
   longitude   Float
   evidenceUrl String?
+  // Reporter-uploaded photo, stored inline as a base64 data URI for MVP
+  // simplicity — no real file storage/CDN. Fine for a handful of incidents;
+  // move to blob storage (S3/R2/etc.) before this needs to scale.
+  photoUrl    String?
+  dangerLevel String   @default("MODERATE")
   status      String   @default("REPORTED")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

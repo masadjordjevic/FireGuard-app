@@ -1,7 +1,9 @@
 import nextDynamic from "next/dynamic";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { assessFireRisk } from "@/lib/riskAssessment";
 import { publicUserSelect } from "@/lib/publicUser";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 // Leaflet touches `window`, so the map must be loaded client-side only
 const IncidentMap = nextDynamic(() => import("@/components/IncidentMap"), { ssr: false });
@@ -34,6 +36,32 @@ export default async function MapPage() {
       <p style={{ color: "var(--smoke)" }}>{incidents.length} reported incident(s).</p>
       <div className="card">
         <IncidentMap incidents={incidentsWithRisk} />
+      </div>
+
+      <div className="grid">
+        {incidentsWithRisk.map((inc) => (
+          <Link
+            key={inc.id}
+            href={`/incidents/${inc.id}`}
+            className="card"
+            style={{ textDecoration: "none", color: "inherit", display: "block" }}
+          >
+            <h3 style={{ marginTop: 0 }}>{inc.title}</h3>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+              <span className={`status-badge status-${inc.status}`}>{inc.status}</span>
+              <span className={`status-badge danger-${inc.dangerLevel}`}>Danger: {inc.dangerLevel}</span>
+              {inc.riskLevel && <span className={`status-badge risk-${inc.riskLevel}`}>Risk: {inc.riskLevel}</span>}
+            </div>
+            <p style={{ fontSize: "0.9rem", color: "var(--smoke)" }}>{inc.description}</p>
+            <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
+              Reported by {inc.reportedBy.name}
+              <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
+            </p>
+          </Link>
+        ))}
+        {incidentsWithRisk.length === 0 && (
+          <p style={{ color: "var(--smoke)" }}>No incidents reported yet.</p>
+        )}
       </div>
     </div>
   );

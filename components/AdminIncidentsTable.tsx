@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import VerifiedBadge from "@/components/VerifiedBadge";
-
-const STATUSES = ["REPORTED", "VERIFIED", "CONTAINED", "RESOLVED", "FALSE_ALARM"] as const;
+import { INCIDENT_STATUSES } from "@/lib/incidentEnums";
 
 type Incident = {
   id: string;
@@ -70,7 +69,7 @@ export default function AdminIncidentsTable({ incidents: initial }: { incidents:
                   disabled={savingId === inc.id}
                   onChange={(e) => updateStatus(inc.id, e.target.value)}
                 >
-                  {STATUSES.map((s) => (
+                  {INCIDENT_STATUSES.map((s) => (
                     <option key={s} value={s}>
                       {s}
                     </option>

@@ -122,14 +122,18 @@ form select {
 
 .status-REPORTED { background: #fff3bf; color: #997404; }
 .status-VERIFIED { background: #ffe3e3; color: #c92a2a; }
-.status-CONTAINED { background: #d0ebff; color: #1864ab; }
+.status-ACTIVE { background: #ffd8a8; color: #d9480f; }
 .status-RESOLVED { background: #d3f9d8; color: #2b8a3e; }
-.status-FALSE_ALARM { background: #e9ecef; color: #495057; }
 
 .risk-LOW { background: #d3f9d8; color: #2b8a3e; }
 .risk-MEDIUM { background: #ffe8cc; color: #d9480f; }
 .risk-HIGH { background: #ffe3e3; color: #c92a2a; }
 .risk-UNKNOWN { background: #e9ecef; color: #495057; }
+
+.danger-LOW { background: #d3f9d8; color: #2b8a3e; }
+.danger-MODERATE { background: #fff3bf; color: #997404; }
+.danger-HIGH { background: #ffd8a8; color: #d9480f; }
+.danger-EXTREME { background: #ffc9c9; color: #c92a2a; }
 
 .verified-badge {
   display: inline-block;

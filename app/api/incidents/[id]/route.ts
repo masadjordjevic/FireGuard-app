@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { INCIDENT_STATUSES } from "@/lib/incidentEnums";
 
 const UpdateInput = z.object({
-  status: z.enum(["REPORTED", "VERIFIED", "CONTAINED", "RESOLVED", "FALSE_ALARM"]),
+  status: z.enum(INCIDENT_STATUSES),
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {

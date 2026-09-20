@@ -34,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }),
     prisma.incident.update({
       where: { id: params.id },
-      data: incident.status === "REPORTED" ? { status: "VERIFIED" } : {},
+      data: incident.status === "REPORTED" ? { status: "VERIFIED" as const } : {},
     }),
   ]);
 

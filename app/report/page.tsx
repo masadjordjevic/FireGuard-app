@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { DANGER_LEVELS } from "@/lib/incidentEnums";
+
+// Keep uploaded photos well under the API's ~6MB base64 cap (see
+// app/api/incidents/route.ts) — reject oversized files client-side instead
+// of letting the encode-and-submit fail late.
+const MAX_PHOTO_BYTES = 4_000_000;
 
 export default function ReportPage() {
   const router = useRouter();
@@ -11,9 +17,12 @@ export default function ReportPage() {
     latitude: "",
     longitude: "",
     evidenceUrl: "",
+    dangerLevel: "MODERATE" as string,
     reporterName: "",
     reporterEmail: "",
   });
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [photoName, setPhotoName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +38,27 @@ export default function ReportPage() {
     });
   }
 
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setPhotoUrl("");
+      setPhotoName(null);
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setError(`Photo is too large (max ${Math.round(MAX_PHOTO_BYTES / 1_000_000)}MB).`);
+      e.target.value = "";
+      return;
+    }
+    setError(null);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPhotoUrl(reader.result as string);
+      setPhotoName(file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -41,6 +71,7 @@ export default function ReportPage() {
           ...form,
           latitude: parseFloat(form.latitude),
           longitude: parseFloat(form.longitude),
+          photoUrl,
         }),
       });
       if (!res.ok) {
@@ -82,6 +113,16 @@ export default function ReportPage() {
             placeholder="What do you see? Size, smoke, wind direction, nearby structures..."
           />
         </label>
+        <label>
+          Danger level
+          <select value={form.dangerLevel} onChange={(e) => update("dangerLevel", e.target.value)}>
+            {DANGER_LEVELS.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+        </label>
         <div style={{ display: "flex", gap: 12 }}>
           <label style={{ flex: 1 }}>
             Latitude
@@ -116,6 +157,11 @@ export default function ReportPage() {
             placeholder="https://..."
           />
         </label>
+        <label>
+          Upload a photo (optional)
+          <input type="file" accept="image/*" onChange={handlePhotoChange} />
+        </label>
+        {photoName && <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>Attached: {photoName}</p>}
         <label>
           Your name
           <input required value={form.reporterName} onChange={(e) => update("reporterName", e.target.value)} />
