@@ -1,7 +1,7 @@
 :root {
   /* Warm, serious wildfire palette — not a generic SaaS cream/gray theme. */
-  --charcoal: #1c1512;       /* charred-wood dark, used for nav/hero */
-  --charcoal-light: #2a201b; /* raised surface on charcoal (cards-on-dark) */
+  --charcoal: #33201a;       /* burnt charcoal — warm brown-red, not flat black */
+  --charcoal-light: #452b22; /* raised surface on charcoal (cards-on-dark) */
   --ash: #2b2420;            /* body text — warm near-black, not pure gray */
   --smoke: #746a60;          /* secondary/muted text — warm gray */
   --bg: #e7e2db;             /* page background — smoke gray, not cream */
@@ -43,6 +43,7 @@ h1, h2, h3, .brand, .stat-number {
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 4px 16px rgba(20, 12, 9, 0.28);
 }
 
 .brand {
@@ -90,8 +91,47 @@ h1, h2, h3, .brand, .stat-number {
   font-size: 0.9rem;
 }
 
-.role-chip {
+/* Primary vs secondary nav actions — Register is the action we want people
+   to take, Log in is for people who already have an account. */
+.nav-btn-primary {
   display: inline-block;
+  background: var(--ember);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.nav-btn-primary:hover {
+  background: var(--ember-dark);
+  color: #fff;
+}
+
+.nav-btn-outline {
+  display: inline-block;
+  background: transparent;
+  color: #d8cfc4;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 5px 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-btn-outline:hover {
+  border-color: var(--ember-glow);
+  color: var(--ember-glow);
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   margin-left: 8px;
   padding: 2px 10px;
   border-radius: 999px;
@@ -145,7 +185,7 @@ main {
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 1px 2px rgba(28, 21, 18, 0.04);
+  box-shadow: 0 1px 2px rgba(51, 32, 26, 0.04);
 }
 
 .btn {
@@ -194,7 +234,9 @@ form select {
 /* --- Badges: bold, escalating severity, not pastel-on-pastel --- */
 
 .status-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 3px 12px;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -219,7 +261,9 @@ form select {
 .risk-UNKNOWN  { background: var(--smoke); color: #fff; }
 
 .verified-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   padding: 2px 8px;
   margin-left: 6px;
   border-radius: 999px;
@@ -280,7 +324,7 @@ form select {
 .hero-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(28, 21, 18, 0.5) 0%, rgba(28, 21, 18, 0.78) 100%);
+  background: linear-gradient(180deg, rgba(51, 32, 26, 0.5) 0%, rgba(51, 32, 26, 0.78) 100%);
 }
 
 .hero-banner-content {

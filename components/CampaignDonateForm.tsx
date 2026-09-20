@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BrowserProvider, Contract, parseEther } from "ethers";
+import { AlertTriangle } from "lucide-react";
 import { DONATION_ABI } from "@/lib/donationContract";
 
 export default function CampaignDonateForm({
@@ -98,8 +99,17 @@ export default function CampaignDonateForm({
         </p>
       )}
       {!contractAddress && (
-        <p style={{ fontSize: "0.8rem", color: "var(--smoke)", marginTop: 14 }}>
-          ⚠️ No contract deployed for this campaign yet.
+        <p
+          style={{
+            fontSize: "0.8rem",
+            color: "var(--smoke)",
+            marginTop: 14,
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          <AlertTriangle size={14} /> No contract deployed for this campaign yet.
         </p>
       )}
     </div>

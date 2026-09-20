@@ -1,19 +1,21 @@
 // FireGuard - Prisma schema
-// Dev: SQLite. Za produkciju promeni provider na "postgresql" i DATABASE_URL u .env
+// Postgres (see DATABASE_URL in .env) — required for deploying on Vercel.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// NOTE: SQLite (the Prisma connector used here) does not support native enums,
-// so status/role are plain strings. Valid values are enforced by the Zod schemas
-// in the API routes (see lib/incidentEnums.ts for status/dangerLevel, lib/roles.ts
-// for role):
+// NOTE: status/role/dangerLevel are plain strings rather than native Postgres
+// enums — this app started on SQLite (no native enum support there) and kept
+// the string + Zod validation approach since it avoids an enum migration for
+// every new value. Valid values are enforced by the Zod schemas in the API
+// routes (see lib/incidentEnums.ts for status/dangerLevel, lib/roles.ts for
+// role):
 //   IncidentStatus: REPORTED | VERIFIED | ACTIVE | RESOLVED
 //   DangerLevel:    LOW | MODERATE | HIGH | EXTREME
 //   UserRole:       CITIZEN | VOLUNTEER | EMERGENCY_SERVICE | NGO | LOCAL_AUTHORITY | DONOR | VALIDATOR | ADMIN

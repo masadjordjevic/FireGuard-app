@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Flame, Map, Users, HandCoins } from "lucide-react";
 
 export default function Home() {
   return (
@@ -24,25 +25,37 @@ export default function Home() {
 
       <div className="grid">
         <Link href="/report" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3> Report a Fire</h3>
+          <h3>
+            <Flame size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
+            Report a Fire
+          </h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Submit location, description and evidence for a new incident.
           </p>
         </Link>
         <Link href="/map" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3> Incident Map</h3>
+          <h3>
+            <Map size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
+            Incident Map
+          </h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             View active and verified incidents near you.
           </p>
         </Link>
         <Link href="/volunteers" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3> Volunteer Hub</h3>
+          <h3>
+            <Users size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
+            Volunteer Hub
+          </h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Create or join community response actions.
           </p>
         </Link>
         <Link href="/campaigns" className="card" style={{ textDecoration: "none", color: "inherit" }}>
-          <h3> Donate</h3>
+          <h3>
+            <HandCoins size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
+            Donate
+          </h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Transparent, blockchain-tracked donations on Sepolia testnet.
           </p>

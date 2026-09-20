@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +57,17 @@ export default async function CampaignsPage() {
                 {totalEth.toFixed(4)} / {c.goalEth} ETH raised ({pct}%)
               </p>
               {!c.contractAddress && (
-                <p style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>⚠️ No contract deployed yet.</p>
+                <p
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "var(--smoke)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                  }}
+                >
+                  <AlertTriangle size={13} /> No contract deployed yet.
+                </p>
               )}
             </Link>
           );

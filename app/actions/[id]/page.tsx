@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { publicUserSelect } from "@/lib/publicUser";
+import { MapPin, Wrench } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import ActionSignupPanel from "@/components/ActionSignupPanel";
 
@@ -31,8 +32,14 @@ export default async function ActionDetailPage({ params }: { params: { id: strin
       <div className="card">
         <h1 style={{ marginTop: 0 }}>{action.title}</h1>
         <p>{action.description}</p>
-        <p style={{ fontSize: "0.9rem" }}>📍 {action.location}</p>
-        {action.neededSkills && <p style={{ fontSize: "0.9rem" }}>🛠 Needed skills: {action.neededSkills}</p>}
+        <p style={{ fontSize: "0.9rem", display: "flex", alignItems: "center", gap: 6 }}>
+          <MapPin size={15} color="var(--ember)" /> {action.location}
+        </p>
+        {action.neededSkills && (
+          <p style={{ fontSize: "0.9rem", display: "flex", alignItems: "center", gap: 6 }}>
+            <Wrench size={15} color="var(--smoke)" /> Needed skills: {action.neededSkills}
+          </p>
+        )}
         {action.startsAt && (
           <p style={{ fontSize: "0.9rem", color: "var(--smoke)" }}>
             Starts: {new Date(action.startsAt).toLocaleString()}

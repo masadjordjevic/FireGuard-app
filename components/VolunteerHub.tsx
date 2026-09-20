@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { MapPin, Wrench } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import ActionSignupPanel from "@/components/ActionSignupPanel";
 
@@ -65,8 +66,14 @@ export default function VolunteerHub() {
                 </Link>
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--smoke)" }}>{a.description}</p>
-              <p style={{ fontSize: "0.85rem" }}>📍 {a.location}</p>
-              {a.neededSkills && <p style={{ fontSize: "0.85rem" }}>🛠 {a.neededSkills}</p>}
+              <p style={{ fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 5 }}>
+                <MapPin size={14} color="var(--ember)" /> {a.location}
+              </p>
+              {a.neededSkills && (
+                <p style={{ fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 5 }}>
+                  <Wrench size={14} color="var(--smoke)" /> {a.neededSkills}
+                </p>
+              )}
               <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
                 {a.signups.length} volunteer(s) signed up · by {a.createdBy.name}
                 <VerifiedBadge didIdentifier={a.createdBy.didIdentifier} />

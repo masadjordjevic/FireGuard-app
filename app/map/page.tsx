@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { assessFireRisk } from "@/lib/riskAssessment";
 import { publicUserSelect } from "@/lib/publicUser";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import StatusBadge from "@/components/StatusBadge";
 
 // Leaflet touches `window`, so the map must be loaded client-side only
 const IncidentMap = nextDynamic(() => import("@/components/IncidentMap"), { ssr: false });
@@ -56,7 +57,7 @@ export default async function MapPage() {
             )}
             <h3 style={{ marginTop: 0 }}>{inc.title}</h3>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-              <span className={`status-badge status-${inc.status}`}>{inc.status}</span>
+              <StatusBadge status={inc.status} />
               <span className={`status-badge danger-${inc.dangerLevel}`}>Danger: {inc.dangerLevel}</span>
               {inc.riskLevel && <span className={`status-badge risk-${inc.riskLevel}`}>Risk: {inc.riskLevel}</span>}
             </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import RoleIcon from "@/components/RoleIcon";
 import { SELF_SERVICE_ROLES } from "@/lib/roles";
 
 type Status = "idle" | "loading" | "saving" | "loaded" | "error";
@@ -105,7 +106,7 @@ export default function ProfilePage() {
         </label>
         {isSelfServiceRole(role) ? (
           <label>
-            Role
+            <RoleIcon role={role} /> Role
             <select value={role} onChange={(e) => setRole(e.target.value)}>
               {SELF_SERVICE_ROLES.map((r) => (
                 <option key={r} value={r}>
@@ -116,7 +117,7 @@ export default function ProfilePage() {
           </label>
         ) : (
           <label>
-            Role
+            <RoleIcon role={role} /> Role
             <input value={role} disabled />
             <span style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>
               Elevated role — contact an administrator to change it.

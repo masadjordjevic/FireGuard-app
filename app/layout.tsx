@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import Link from "next/link";
+import { Flame, Menu } from "lucide-react";
 import Providers from "@/components/Providers";
 import NavAuth from "@/components/NavAuth";
 
@@ -31,11 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <header className="nav">
             <Link href="/" className="brand">
-              🔥 Fire<span>Guard</span>
+              <Flame size={22} color="var(--ember-glow)" style={{ verticalAlign: "-4px", marginRight: 4 }} />
+              Fire<span>Guard</span>
             </Link>
             <input type="checkbox" id="nav-toggle" className="nav-toggle-checkbox" />
             <label htmlFor="nav-toggle" className="nav-toggle-label">
-              ☰
+              <Menu size={24} />
             </label>
             <nav>
               <Link href="/map">Map</Link>

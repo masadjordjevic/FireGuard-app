@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import StatusBadge from "@/components/StatusBadge";
 import { INCIDENT_STATUSES } from "@/lib/incidentEnums";
 
 type Incident = {
@@ -61,8 +62,8 @@ export default function AdminIncidentsTable({ incidents: initial }: { incidents:
                 <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
               </td>
               <td>
-                <span className={`status-badge status-${inc.status}`} style={{ marginRight: 8 }}>
-                  {inc.status}
+                <span style={{ marginRight: 8, display: "inline-block" }}>
+                  <StatusBadge status={inc.status} />
                 </span>
                 <select
                   value={inc.status}

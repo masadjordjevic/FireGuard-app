@@ -1,3 +1,4 @@
+import { BadgeCheck } from "lucide-react";
 import { isVerified } from "@/lib/did";
 
 export default function VerifiedBadge({ didIdentifier }: { didIdentifier?: string | null }) {
@@ -5,7 +6,8 @@ export default function VerifiedBadge({ didIdentifier }: { didIdentifier?: strin
 
   return (
     <span className="verified-badge" title={`DID: ${didIdentifier}`}>
-      ✓ Verified
+      <BadgeCheck size={12} />
+      Verified
     </span>
   );
 }

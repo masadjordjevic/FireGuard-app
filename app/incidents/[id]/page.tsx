@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { publicUserSelect } from "@/lib/publicUser";
 import { assessFireRisk } from "@/lib/riskAssessment";
+import { MapPin } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import StatusBadge from "@/components/StatusBadge";
 import IncidentConfirmPanel from "@/components/IncidentConfirmPanel";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +31,7 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
           <h1 style={{ marginTop: 0 }}>{incident.title}</h1>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
-            <span className={`status-badge status-${incident.status}`}>{incident.status}</span>
+            <StatusBadge status={incident.status} />
             <span className={`status-badge danger-${incident.dangerLevel}`}>Danger: {incident.dangerLevel}</span>
           </div>
         </div>
@@ -44,8 +46,8 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
 
         <p>{incident.description}</p>
 
-        <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
-          📍 {incident.latitude.toFixed(6)}, {incident.longitude.toFixed(6)}
+        <p style={{ fontSize: "0.85rem", color: "var(--smoke)", display: "flex", alignItems: "center", gap: 5 }}>
+          <MapPin size={14} color="var(--ember)" /> {incident.latitude.toFixed(6)}, {incident.longitude.toFixed(6)}
         </p>
 
         {risk && (

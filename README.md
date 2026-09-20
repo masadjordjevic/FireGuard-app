@@ -5,7 +5,7 @@ Solidity donation contract on Sepolia testnet.
 
 ## Stack
 - **Next.js 14** (App Router, TypeScript) — frontend + API routes
-- **Prisma + SQLite** — dev database (incidents, volunteer actions, users, donations)
+- **Prisma + PostgreSQL** — database (incidents, volunteer actions, users, donations)
 - **react-leaflet** — interactive incident map (OpenStreetMap, no API key needed)
 - **Hardhat + Solidity** — `DonationCampaign.sol` deployed to Ethereum Sepolia testnet
 - **ethers.js** — connects MetaMask on the `/donate` page and calls the contract directly
@@ -21,8 +21,8 @@ Solidity donation contract on Sepolia testnet.
 
 ```bash
 npm install
-cp .env.example .env
-npm run prisma:migrate      # creates dev.db and applies the schema
+cp .env.example .env         # then set DATABASE_URL to your Postgres connection string
+npm run prisma:migrate      # applies the schema (first run creates migration history)
 npm run dev                 # http://localhost:3000
 ```
 

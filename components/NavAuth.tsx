@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { isAdmin, isElevatedRole, formatRole } from "@/lib/roles";
+import RoleIcon from "@/components/RoleIcon";
 
 export default function NavAuth() {
   const { data: session, status } = useSession();
@@ -12,8 +13,12 @@ export default function NavAuth() {
   if (!session) {
     return (
       <>
-        <Link href="/login">Log in</Link>
-        <Link href="/register">Register</Link>
+        <Link href="/login" className="nav-btn-outline">
+          Log in
+        </Link>
+        <Link href="/register" className="nav-btn-primary">
+          Register
+        </Link>
       </>
     );
   }
@@ -25,6 +30,7 @@ export default function NavAuth() {
       <span className="nav-user">
         {session.user.name}
         <span className={`role-chip ${isElevatedRole(session.user.role) ? "role-chip-elevated" : ""}`}>
+          <RoleIcon role={session.user.role} />
           {formatRole(session.user.role)}
         </span>
       </span>
