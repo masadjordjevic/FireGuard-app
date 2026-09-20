@@ -27,10 +27,16 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
+      }
+      // Lets the client push a fresh role into the JWT via
+      // useSession().update({ role }) right after a profile save, instead of
+      // the change only taking effect on the next login (see app/profile/page.tsx).
+      if (trigger === "update" && session?.role) {
+        token.role = session.role;
       }
       return token;
     },

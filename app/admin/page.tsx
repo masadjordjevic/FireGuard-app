@@ -1,4 +1,8 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
+import { isAdmin } from "@/lib/roles";
 import AdminIncidentsTable from "@/components/AdminIncidentsTable";
 import AdminSyncDonationsButton from "@/components/AdminSyncDonationsButton";
 import VerifiedBadge from "@/components/VerifiedBadge";
@@ -7,10 +11,18 @@ import { publicUserSelect } from "@/lib/publicUser";
 // Always show current data, never a statically cached snapshot
 export const dynamic = "force-dynamic";
 
-// NOTE: this page has no authentication/authorization — anyone with the URL
-// can view it and change incident statuses. Acceptable for an MVP demo, but
-// it must sit behind an admin-only auth check before any real deployment.
 export default async function AdminPage() {
+  const session = await getServerSession(authOptions);
+  if (!session) redirect("/login");
+  if (!isAdmin(session.user.role)) {
+    return (
+      <div className="card" style={{ maxWidth: 480, margin: "0 auto" }}>
+        <h1>Access denied</h1>
+        <p style={{ color: "var(--smoke)" }}>You don't have permission to view this page.</p>
+      </div>
+    );
+  }
+
   const [incidents, actions, donations, users] = await Promise.all([
     prisma.incident.findMany({
       orderBy: { createdAt: "desc" },

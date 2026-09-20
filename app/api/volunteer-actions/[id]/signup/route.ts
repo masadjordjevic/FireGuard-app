@@ -21,9 +21,26 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const signup = await prisma.volunteerSignup.create({
-    data: { actionId: params.id, userId: session.user.id, ...parsed.data },
+  // Idempotent join: re-submitting (e.g. to update skills/availability)
+  // updates the existing signup instead of erroring on the unique constraint.
+  const signup = await prisma.volunteerSignup.upsert({
+    where: { actionId_userId: { actionId: params.id, userId: session.user.id } },
+    update: parsed.data,
+    create: { actionId: params.id, userId: session.user.id, ...parsed.data },
   });
 
   return NextResponse.json(signup, { status: 201 });
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "You must be logged in to leave an action" }, { status: 401 });
+  }
+
+  await prisma.volunteerSignup.deleteMany({
+    where: { actionId: params.id, userId: session.user.id },
+  });
+
+  return NextResponse.json({ success: true });
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useRouter } from "next/navigation";
@@ -13,7 +14,7 @@ const icon = L.icon({
   iconAnchor: [12, 41],
 });
 
-type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN";
+type RiskLevel = "LOW" | "MODERATE" | "HIGH" | "EXTREME" | "UNKNOWN";
 
 type Incident = {
   id: string;
@@ -24,6 +25,21 @@ type Incident = {
   riskLevel?: RiskLevel;
 };
 
+// Fits the viewport to every incident's coordinates instead of a fixed
+// center/zoom, so the map reads correctly whether incidents are clustered in
+// one city or spread across multiple countries/regions.
+function FitToIncidents({ incidents }: { incidents: Incident[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (incidents.length === 0) return;
+    const bounds = L.latLngBounds(incidents.map((inc) => [inc.latitude, inc.longitude] as [number, number]));
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+  }, [map, incidents]);
+
+  return null;
+}
+
 export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
   const router = useRouter();
   const center: [number, number] =
@@ -31,6 +47,7 @@ export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
 
   return (
     <MapContainer center={center} zoom={7} style={{ height: "500px", width: "100%", borderRadius: 12 }}>
+      <FitToIncidents incidents={incidents} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

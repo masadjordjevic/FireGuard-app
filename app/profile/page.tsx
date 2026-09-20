@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { SELF_SERVICE_ROLES } from "@/lib/roles";
 
 type Status = "idle" | "loading" | "saving" | "loaded" | "error";
 
+function isSelfServiceRole(role: string): role is (typeof SELF_SERVICE_ROLES)[number] {
+  return (SELF_SERVICE_ROLES as readonly string[]).includes(role);
+}
+
 export default function ProfilePage() {
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus, update: updateSession } = useSession();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
@@ -44,15 +49,24 @@ export default function ProfilePage() {
     setStatus("saving");
     setError(null);
     try {
+      const body: Record<string, string> = { name, didIdentifier };
+      if (isSelfServiceRole(role)) body.role = role;
+
       const res = await fetch("/api/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, didIdentifier }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(JSON.stringify(data.error ?? "Failed to save profile"));
       }
+      const updated = await res.json();
+      setRole(updated.role);
+      // Push the fresh role into the JWT/session immediately (via the jwt
+      // callback's "update" trigger in lib/auth.ts) so the nav bar reflects
+      // it right away instead of requiring a logout/login.
+      await updateSession({ role: updated.role });
       setStatus("loaded");
     } catch (err: any) {
       setError(err.message);
@@ -89,10 +103,26 @@ export default function ProfilePage() {
           Email
           <input value={email} disabled />
         </label>
-        <label>
-          Role
-          <input value={role} disabled />
-        </label>
+        {isSelfServiceRole(role) ? (
+          <label>
+            Role
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              {SELF_SERVICE_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label>
+            Role
+            <input value={role} disabled />
+            <span style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>
+              Elevated role — contact an administrator to change it.
+            </span>
+          </label>
+        )}
         <label>
           Name
           <input required value={name} onChange={(e) => setName(e.target.value)} />

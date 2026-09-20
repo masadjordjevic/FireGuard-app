@@ -12,7 +12,12 @@
     "prisma:studio": "prisma studio",
     "compile:contracts": "hardhat compile",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
-    "sync:donations": "node scripts/sync-donations.js"
+    "sync:donations": "node scripts/sync-donations.js",
+    "seed": "prisma db seed",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "5.18.0",
@@ -36,6 +41,7 @@
     "dotenv": "16.4.5",
     "hardhat": "2.29.1",
     "prisma": "5.18.0",
+    "tsx": "^4.23.15",
     "typescript": "5.5.4"
   }
 }

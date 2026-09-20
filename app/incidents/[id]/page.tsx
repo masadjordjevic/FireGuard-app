@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { publicUserSelect } from "@/lib/publicUser";
+import { assessFireRisk } from "@/lib/riskAssessment";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import IncidentConfirmPanel from "@/components/IncidentConfirmPanel";
 
@@ -19,6 +20,8 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
   });
 
   if (!incident) notFound();
+
+  const risk = await assessFireRisk(incident.latitude, incident.longitude).catch(() => null);
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto" }}>
@@ -44,6 +47,13 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
         <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
           📍 {incident.latitude.toFixed(6)}, {incident.longitude.toFixed(6)}
         </p>
+
+        {risk && (
+          <div style={{ marginBottom: 10 }}>
+            <span className={`status-badge risk-${risk.riskLevel}`}>Current fire risk: {risk.riskLevel}</span>
+            <p style={{ fontSize: "0.85rem", color: "var(--smoke)", marginTop: 4 }}>{risk.explanation}</p>
+          </div>
+        )}
 
         {incident.evidenceUrl && (
           <p style={{ fontSize: "0.85rem" }}>

@@ -46,6 +46,14 @@ export default async function MapPage() {
             className="card"
             style={{ textDecoration: "none", color: "inherit", display: "block" }}
           >
+            {inc.photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={inc.photoUrl}
+                alt=""
+                style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8, marginBottom: 10 }}
+              />
+            )}
             <h3 style={{ marginTop: 0 }}>{inc.title}</h3>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
               <span className={`status-badge status-${inc.status}`}>{inc.status}</span>

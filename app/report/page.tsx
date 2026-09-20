@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DANGER_LEVELS } from "@/lib/incidentEnums";
+import RiskAssessmentBadge from "@/components/RiskAssessmentBadge";
 
 // Keep uploaded photos well under the API's ~6MB base64 cap (see
 // app/api/incidents/route.ts) — reject oversized files client-side instead
@@ -148,6 +149,10 @@ export default function ReportPage() {
         <button type="button" className="btn" style={{ background: "var(--smoke)", marginBottom: 14 }} onClick={useMyLocation}>
           Use my current location
         </button>
+        <RiskAssessmentBadge
+          latitude={form.latitude ? parseFloat(form.latitude) : null}
+          longitude={form.longitude ? parseFloat(form.longitude) : null}
+        />
         <label>
           Evidence URL (photo/video link, optional)
           <input

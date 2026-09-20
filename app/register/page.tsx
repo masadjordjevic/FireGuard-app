@@ -4,10 +4,11 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { SELF_SERVICE_ROLES } from "@/lib/roles";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "CITIZEN" as string });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -66,6 +67,19 @@ export default function RegisterPage() {
             onChange={(e) => update("password", e.target.value)}
           />
         </label>
+        <label>
+          I am a...
+          <select value={form.role} onChange={(e) => update("role", e.target.value)}>
+            {SELF_SERVICE_ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p style={{ fontSize: "0.8rem", color: "var(--smoke)", marginTop: -8 }}>
+          Emergency service / validator accounts are granted manually by an administrator.
+        </p>
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <button className="btn" type="submit" disabled={loading}>
           {loading ? "Creating..." : "Create account"}

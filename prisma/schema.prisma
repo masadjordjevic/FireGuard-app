@@ -12,10 +12,15 @@ datasource db {
 
 // NOTE: SQLite (the Prisma connector used here) does not support native enums,
 // so status/role are plain strings. Valid values are enforced by the Zod schemas
-// in the API routes (see lib/incidentEnums.ts for status/dangerLevel):
+// in the API routes (see lib/incidentEnums.ts for status/dangerLevel, lib/roles.ts
+// for role):
 //   IncidentStatus: REPORTED | VERIFIED | ACTIVE | RESOLVED
 //   DangerLevel:    LOW | MODERATE | HIGH | EXTREME
-//   UserRole:       CITIZEN | VOLUNTEER | EMERGENCY_SERVICE | NGO | LOCAL_AUTHORITY | DONOR | VALIDATOR
+//   UserRole:       CITIZEN | VOLUNTEER | EMERGENCY_SERVICE | NGO | LOCAL_AUTHORITY | DONOR | VALIDATOR | ADMIN
+//     - CITIZEN/NGO are self-service (registration + profile can set these)
+//     - EMERGENCY_SERVICE/VALIDATOR unlock high-trust incident confirmation
+//     - ADMIN unlocks the /admin dashboard
+//     - the latter three are only ever granted manually (e.g. Prisma Studio)
 
 model User {
   id            String   @id @default(cuid())
@@ -103,6 +108,10 @@ model VolunteerSignup {
   actionId String
   user     User            @relation(fields: [userId], references: [id])
   userId   String
+
+  // One signup per user per action — lets Join/Leave be an idempotent
+  // upsert/delete instead of accumulating duplicate rows.
+  @@unique([actionId, userId])
 }
 
 model DonationCampaign {
