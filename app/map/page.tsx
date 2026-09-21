@@ -44,7 +44,7 @@ export default async function MapPage() {
           <Link
             key={inc.id}
             href={`/incidents/${inc.id}`}
-            className="card"
+            className={`card card-accent-${inc.dangerLevel}`}
             style={{ textDecoration: "none", color: "inherit", display: "block" }}
           >
             {inc.photoUrl && (
@@ -69,7 +69,9 @@ export default async function MapPage() {
           </Link>
         ))}
         {incidentsWithRisk.length === 0 && (
-          <p style={{ color: "var(--smoke)" }}>No incidents reported yet.</p>
+          <p className="empty-state">
+            No incidents reported yet — be the first to report a fire in your area.
+          </p>
         )}
       </div>
     </div>

@@ -45,7 +45,7 @@ export default async function CampaignDetailPage({ params }: { params: { id: str
             margin: "8px 0",
           }}
         >
-          <div style={{ background: "var(--ember)", width: `${pct}%`, height: "100%" }} />
+          <div style={{ background: "var(--support)", width: `${pct}%`, height: "100%" }} />
         </div>
         <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
           {totalEth.toFixed(4)} / {campaign.goalEth} ETH raised ({pct}%) · {aggregate._count} donation(s)
@@ -60,7 +60,7 @@ export default async function CampaignDetailPage({ params }: { params: { id: str
       <div className="card">
         <h2>Donation History</h2>
         {donations.length === 0 ? (
-          <p style={{ color: "var(--smoke)" }}>No donations yet — be the first.</p>
+          <p className="empty-state">No donations yet — be the first to support this campaign.</p>
         ) : (
           <ul style={{ paddingLeft: 18 }}>
             {donations.map((d) => (

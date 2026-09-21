@@ -1,8 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Flame, Map, Users, HandCoins } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const activeIncidents = await prisma.incident.count({ where: { status: { not: "RESOLVED" } } });
+
   return (
     <div>
       <section className="hero-banner">
@@ -20,11 +25,15 @@ export default function Home() {
             FireGuard connects citizens, volunteers, emergency services, NGOs and donors
             in one shared ecosystem for wildfire reporting and community response.
           </p>
+          <div className="hero-stat">
+            <span className="stat-number">{activeIncidents}</span>
+            <span className="stat-label">active incident{activeIncidents === 1 ? "" : "s"} right now</span>
+          </div>
         </div>
       </section>
 
       <div className="grid">
-        <Link href="/report" className="card" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link href="/report" className="card card-accent-ember" style={{ textDecoration: "none", color: "inherit" }}>
           <h3>
             <Flame size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
             Report a Fire
@@ -33,7 +42,7 @@ export default function Home() {
             Submit location, description and evidence for a new incident.
           </p>
         </Link>
-        <Link href="/map" className="card" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link href="/map" className="card card-accent-ember" style={{ textDecoration: "none", color: "inherit" }}>
           <h3>
             <Map size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
             Incident Map
@@ -42,18 +51,18 @@ export default function Home() {
             View active and verified incidents near you.
           </p>
         </Link>
-        <Link href="/volunteers" className="card" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link href="/volunteers" className="card card-accent-community" style={{ textDecoration: "none", color: "inherit" }}>
           <h3>
-            <Users size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
+            <Users size={20} color="var(--community)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
             Volunteer Hub
           </h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
             Create or join community response actions.
           </p>
         </Link>
-        <Link href="/campaigns" className="card" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link href="/campaigns" className="card card-accent-support" style={{ textDecoration: "none", color: "inherit" }}>
           <h3>
-            <HandCoins size={20} color="var(--ember)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
+            <HandCoins size={20} color="var(--support)" style={{ verticalAlign: "-4px", marginRight: 6 }} />
             Donate
           </h3>
           <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>

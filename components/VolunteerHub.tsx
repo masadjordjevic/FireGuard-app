@@ -59,7 +59,7 @@ export default function VolunteerHub() {
         {actions.map((a) => {
           const mine = session ? a.signups.some((s) => s.userId === session.user.id) : false;
           return (
-            <div className="card" key={a.id}>
+            <div className="card card-accent-community" key={a.id}>
               <h3>
                 <Link href={`/actions/${a.id}`} style={{ color: "inherit" }}>
                   {a.title}
@@ -67,7 +67,7 @@ export default function VolunteerHub() {
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--smoke)" }}>{a.description}</p>
               <p style={{ fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 5 }}>
-                <MapPin size={14} color="var(--ember)" /> {a.location}
+                <MapPin size={14} color="var(--community)" /> {a.location}
               </p>
               {a.neededSkills && (
                 <p style={{ fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 5 }}>
@@ -87,7 +87,9 @@ export default function VolunteerHub() {
             </div>
           );
         })}
-        {actions.length === 0 && <p style={{ color: "var(--smoke)" }}>No volunteer actions yet. Be the first to create one.</p>}
+        {actions.length === 0 && (
+          <p className="empty-state">No volunteer actions yet — be the first to organize one.</p>
+        )}
       </div>
     </div>
   );

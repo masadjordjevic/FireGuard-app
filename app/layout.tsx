@@ -25,6 +25,12 @@ export const metadata: Metadata = {
   description: "Decentralized wildfire reporting & community response platform",
 };
 
+// The whole app is inherently dynamic (session-aware nav, live DB reads on
+// nearly every page) — force every route to render per-request instead of
+// letting Next.js try to statically prerender pages that use next-auth's
+// SessionProvider, which fails at build time if NEXTAUTH_URL isn't resolvable.
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${barlow.variable} ${barlowCondensed.variable}`}>

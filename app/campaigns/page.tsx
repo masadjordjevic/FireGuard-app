@@ -37,7 +37,7 @@ export default async function CampaignsPage() {
             <Link
               key={c.id}
               href={`/campaigns/${c.id}`}
-              className="card"
+              className="card card-accent-support"
               style={{ textDecoration: "none", color: "inherit", display: "block" }}
             >
               <h3 style={{ marginTop: 0 }}>{c.title}</h3>
@@ -51,7 +51,7 @@ export default async function CampaignsPage() {
                   margin: "8px 0",
                 }}
               >
-                <div style={{ background: "var(--ember)", width: `${pct}%`, height: "100%" }} />
+                <div style={{ background: "var(--support)", width: `${pct}%`, height: "100%" }} />
               </div>
               <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
                 {totalEth.toFixed(4)} / {c.goalEth} ETH raised ({pct}%)
@@ -73,9 +73,7 @@ export default async function CampaignsPage() {
           );
         })}
         {campaigns.length === 0 && (
-          <p style={{ color: "var(--smoke)" }}>
-            No campaigns yet — run <code>npm run seed</code> to create a few demo campaigns.
-          </p>
+          <p className="empty-state">No active campaigns right now — check back soon.</p>
         )}
       </div>
     </div>

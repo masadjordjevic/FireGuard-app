@@ -59,7 +59,7 @@ export default async function ActionDetailPage({ params }: { params: { id: strin
       <div className="card">
         <h2>Volunteers signed up ({action.signups.length})</h2>
         {action.signups.length === 0 ? (
-          <p style={{ color: "var(--smoke)" }}>No one has signed up yet.</p>
+          <p className="empty-state">No one has signed up yet — be the first volunteer.</p>
         ) : (
           <ul style={{ paddingLeft: 18 }}>
             {action.signups.map((s) => (
