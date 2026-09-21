@@ -33,7 +33,7 @@ export default function VolunteerHub() {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <h2>Open Actions</h2>
         {session ? (
           <button className="btn" onClick={() => setShowForm((s) => !s)}>

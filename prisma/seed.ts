@@ -103,8 +103,23 @@ async function main() {
   });
   const marija = await upsertUser({ name: "Marija Babić", email: "marija.babic@example.com", role: "NGO" });
   const luka = await upsertUser({ name: "Luka Perić", email: "luka.peric@example.com", role: "CITIZEN" });
+  const nikola = await upsertUser({ name: "Nikola Radović", email: "nikola.radovic@example.com", role: "CITIZEN" });
+  const jovana = await upsertUser({ name: "Jovana Simić", email: "jovana.simic@example.com", role: "CITIZEN" });
+  const milos = await upsertUser({
+    name: "Miloš Pavlović",
+    email: "milos.pavlovic@fireservice.example.com",
+    role: "EMERGENCY_SERVICE",
+  });
+  const tamara = await upsertUser({ name: "Tamara Jovanović", email: "tamara.jovanovic@example.com", role: "NGO" });
+  const aleksandar = await upsertUser({
+    name: "Aleksandar Kovačević",
+    email: "aleksandar.kovacevic@fireservice.example.com",
+    role: "EMERGENCY_SERVICE",
+  });
+  const milica = await upsertUser({ name: "Milica Stanković", email: "milica.stankovic@example.com", role: "CITIZEN" });
 
-  console.log(`Seeded 7 users (demo login password for all: "${DEMO_PASSWORD}")`);
+  const allUsers = [marko, ana, petar, ivana, stefan, marija, luka, nikola, jovana, milos, tamara, aleksandar, milica];
+  console.log(`Seeded ${allUsers.length} users (demo login password for all: "${DEMO_PASSWORD}")`);
 
   // Real Unsplash photos (found via search, not invented) sized/cropped
   // consistently — next/image generates the actual srcset at request time.
@@ -216,6 +231,76 @@ async function main() {
       reportedBy: luka,
       confirmedBy: petar,
     },
+    {
+      title: "Fire aftermath on Zlatibor hiking path",
+      description:
+        "A contained fire left a scorched path through pine forest near Zlatibor. Fire service confirms the area is now safe to approach.",
+      latitude: 43.73,
+      longitude: 19.7,
+      dangerLevel: "LOW",
+      status: "RESOLVED",
+      photoUrl: unsplashPhoto("1762130099386-a206cd876302"),
+      reportedBy: nikola,
+      confirmedBy: milos,
+    },
+    {
+      title: "Smoke column rising over Tara National Park",
+      description:
+        "Park staff spotted a dense smoke column over a remote section of Tara National Park. Difficult terrain is slowing crew access.",
+      latitude: 43.9,
+      longitude: 19.35,
+      dangerLevel: "HIGH",
+      status: "REPORTED",
+      photoUrl: unsplashPhoto("1731739994975-d55f1a94cff9"),
+      reportedBy: jovana,
+    },
+    {
+      title: "Wildfire threatening ski resort access road near Kopaonik",
+      description:
+        "Fast-spreading fire near the main access road to Kopaonik. Emergency services have closed the road as a precaution.",
+      latitude: 43.28,
+      longitude: 20.81,
+      dangerLevel: "EXTREME",
+      status: "ACTIVE",
+      photoUrl: unsplashPhoto("1726004478569-61b66fa2198b"),
+      reportedBy: milica,
+      confirmedBy: aleksandar,
+    },
+    {
+      title: "Fire spotted in Krka National Park canyon",
+      description:
+        "Visitors reported flames in the canyon below one of the main waterfalls at Krka National Park. Boat traffic on the river has been suspended.",
+      latitude: 43.8,
+      longitude: 15.97,
+      dangerLevel: "HIGH",
+      status: "VERIFIED",
+      photoUrl: unsplashPhoto("1726004522548-2883314a4e2d"),
+      reportedBy: tamara,
+      confirmedBy: aleksandar,
+    },
+    {
+      title: "Brushfire near Paklenica canyon entrance",
+      description:
+        "A brushfire broke out close to the main entrance of Paklenica National Park, sending smoke over the parking area. Visitors were evacuated as a precaution.",
+      latitude: 44.33,
+      longitude: 15.62,
+      dangerLevel: "MODERATE",
+      status: "VERIFIED",
+      photoUrl: unsplashPhoto("1736355895984-a07a970ead7e"),
+      reportedBy: milica,
+      confirmedBy: milos,
+    },
+    {
+      title: "Fire reported on Učka mountain slope",
+      description:
+        "A hiker photographed open flames on a slope of Učka mountain overlooking the Istrian coast. Local fire crews are en route.",
+      latitude: 45.3,
+      longitude: 14.14,
+      dangerLevel: "MODERATE",
+      status: "REPORTED",
+      photoUrl: unsplashPhoto("1720453221316-290ea38c6fd2"),
+      reportedBy: nikola,
+    },
   ];
 
   for (const def of incidentDefs) {
@@ -275,6 +360,50 @@ async function main() {
         { user: marija, skills: "Owns a two-way radio" },
       ],
     },
+    {
+      title: "Water station volunteers near Kopaonik",
+      description: "Set up and staff a water and rest station along the access road for crews fighting the Kopaonik wildfire.",
+      location: "Kopaonik, Serbia",
+      neededSkills: "Able to lift supplies, own transport a plus",
+      createdBy: milos,
+      signups: [
+        { user: nikola, skills: "Has a pickup truck" },
+        { user: milica, skills: "Available all week" },
+      ],
+    },
+    {
+      title: "Debris cleanup at Zlatibor burn site",
+      description: "Help clear scorched debris and fallen branches along the reopened Zlatibor hiking path.",
+      location: "Zlatibor, Serbia",
+      neededSkills: "Physical work, sturdy boots recommended",
+      createdBy: nikola,
+      signups: [
+        { user: jovana, skills: "Weekend availability" },
+        { user: luka, skills: "Has gloves and a chainsaw" },
+      ],
+    },
+    {
+      title: "Boat traffic coordination at Krka National Park",
+      description: "Assist park rangers with rerouting visitor boat traffic away from the canyon affected by the fire.",
+      location: "Krka National Park, Croatia",
+      neededSkills: "Comfortable on boats, good communication skills",
+      createdBy: tamara,
+      signups: [
+        { user: aleksandar, skills: "Certified boat operator" },
+        { user: ana, skills: "Speaks Croatian and English" },
+      ],
+    },
+    {
+      title: "Visitor evacuation support at Paklenica",
+      description: "Help guide visitors safely away from the Paklenica canyon entrance and coordinate parking area evacuation.",
+      location: "Paklenica, Croatia",
+      neededSkills: "Calm under pressure, crowd guidance experience a plus",
+      createdBy: milica,
+      signups: [
+        { user: milos, skills: "Trained in crowd control" },
+        { user: tamara, skills: "Bilingual, Italian and English" },
+      ],
+    },
   ];
 
   for (const def of actionDefs) {
@@ -331,6 +460,33 @@ async function main() {
       donations: [
         { donor: marija, amountEth: 0.5 },
         { donor: stefan, amountEth: 0.1 },
+      ],
+    },
+    {
+      title: "Kopaonik Wildfire Emergency Fund",
+      description: "Urgent support for crews battling the fast-spreading wildfire threatening the Kopaonik access road.",
+      goalEth: 3,
+      donations: [
+        { donor: milica, amountEth: 0.4 },
+        { donor: nikola, amountEth: 0.2 },
+      ],
+    },
+    {
+      title: "Krka National Park Restoration Fund",
+      description: "Restoring canyon trails and river ecosystems affected by the recent fire at Krka National Park.",
+      goalEth: 1.5,
+      donations: [
+        { donor: tamara, amountEth: 0.25 },
+        { donor: aleksandar, amountEth: 0.1 },
+      ],
+    },
+    {
+      title: "Zlatibor Trail Recovery Fund",
+      description: "Rebuilding hiking infrastructure and replanting trees along the Zlatibor path damaged by fire.",
+      goalEth: 1,
+      donations: [
+        { donor: jovana, amountEth: 0.05 },
+        { donor: luka, amountEth: 0.15 },
       ],
     },
   ];

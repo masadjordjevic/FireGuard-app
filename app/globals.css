@@ -212,6 +212,10 @@ h1, h2, h3, .brand, .stat-number {
 
 
 @media (max-width: 760px) {
+  .nav {
+    padding: 14px 20px;
+  }
+
   .nav-toggle-label {
     display: block;
   }
@@ -227,6 +231,13 @@ h1, h2, h3, .brand, .stat-number {
 
   .nav-toggle-checkbox:checked ~ nav {
     display: flex;
+  }
+
+  /* The avatar sits near the left edge once nav stacks vertically, so a
+     dropdown anchored to its right edge would hang off-screen to the left. */
+  .nav-dropdown {
+    left: 0;
+    right: auto;
   }
 }
 

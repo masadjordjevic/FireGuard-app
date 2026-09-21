@@ -40,6 +40,7 @@ export default function AdminPendingVerifications({ users }: { users: PendingUse
   return (
     <div>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
+      <div style={{ overflowX: "auto" }}>
       <table className="admin-table">
         <thead>
           <tr>
@@ -84,6 +85,7 @@ export default function AdminPendingVerifications({ users }: { users: PendingUse
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

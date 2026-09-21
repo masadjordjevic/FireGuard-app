@@ -29,8 +29,8 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
   return (
     <div style={{ maxWidth: 720, margin: "0 auto" }}>
       <div className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-          <h1 style={{ marginTop: 0 }}>{incident.title}</h1>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+          <h1 style={{ marginTop: 0, minWidth: 0, overflowWrap: "break-word" }}>{incident.title}</h1>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
             <StatusBadge status={incident.status} />
             <span className={`status-badge danger-${incident.dangerLevel}`}>Danger: {incident.dangerLevel}</span>

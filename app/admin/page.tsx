@@ -67,6 +67,7 @@ export default async function AdminPage() {
 
       <section className="card">
         <h2>Volunteer Actions ({actions.length})</h2>
+        <div style={{ overflowX: "auto" }}>
         <table className="admin-table">
           <thead>
             <tr>
@@ -97,13 +98,15 @@ export default async function AdminPage() {
             )}
           </tbody>
         </table>
+        </div>
       </section>
 
       <section className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h2>Donations ({donations.length})</h2>
           <AdminSyncDonationsButton />
         </div>
+        <div style={{ overflowX: "auto" }}>
         <table className="admin-table">
           <thead>
             <tr>
@@ -138,10 +141,12 @@ export default async function AdminPage() {
             )}
           </tbody>
         </table>
+        </div>
       </section>
 
       <section className="card">
         <h2>Users by Reputation ({users.length})</h2>
+        <div style={{ overflowX: "auto" }}>
         <table className="admin-table">
           <thead>
             <tr>
@@ -172,6 +177,7 @@ export default async function AdminPage() {
             )}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );

@@ -41,6 +41,7 @@ export default function AdminIncidentsTable({ incidents: initial }: { incidents:
   return (
     <div>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
+      <div style={{ overflowX: "auto" }}>
       <table className="admin-table">
         <thead>
           <tr>
@@ -88,6 +89,7 @@ export default function AdminIncidentsTable({ incidents: initial }: { incidents:
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
