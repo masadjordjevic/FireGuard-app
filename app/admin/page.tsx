@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { isAdmin } from "@/lib/roles";
 import AdminIncidentsTable from "@/components/AdminIncidentsTable";
+import AdminPendingVerifications from "@/components/AdminPendingVerifications";
 import AdminSyncDonationsButton from "@/components/AdminSyncDonationsButton";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { publicUserSelect } from "@/lib/publicUser";
@@ -23,7 +24,7 @@ export default async function AdminPage() {
     );
   }
 
-  const [incidents, actions, donations, users] = await Promise.all([
+  const [incidents, actions, donations, users, pendingVerifications] = await Promise.all([
     prisma.incident.findMany({
       orderBy: { createdAt: "desc" },
       include: { reportedBy: { select: publicUserSelect } },
@@ -40,6 +41,11 @@ export default async function AdminPage() {
       orderBy: { reputation: "desc" },
       select: publicUserSelect,
     }),
+    prisma.user.findMany({
+      where: { emailVerified: false, verificationRequestedAt: { not: null } },
+      orderBy: { verificationRequestedAt: "asc" },
+      select: { id: true, name: true, email: true, role: true },
+    }),
   ]);
 
   return (
@@ -50,6 +56,11 @@ export default async function AdminPage() {
       </p>
 
       <section className="card" style={{ marginTop: 24 }}>
+        <h2>Pending Verifications ({pendingVerifications.length})</h2>
+        <AdminPendingVerifications users={pendingVerifications} />
+      </section>
+
+      <section className="card">
         <h2>Incidents ({incidents.length})</h2>
         <AdminIncidentsTable incidents={incidents} />
       </section>
@@ -72,7 +83,7 @@ export default async function AdminPage() {
                 <td>{a.location}</td>
                 <td>
                   {a.createdBy.name}
-                  <VerifiedBadge didIdentifier={a.createdBy.didIdentifier} />
+                  <VerifiedBadge verified={a.createdBy.emailVerified} />
                 </td>
                 <td>{a.signups.length}</td>
               </tr>
@@ -145,7 +156,7 @@ export default async function AdminPage() {
               <tr key={u.id}>
                 <td>
                   {u.name}
-                  <VerifiedBadge didIdentifier={u.didIdentifier} />
+                  <VerifiedBadge verified={u.emailVerified} />
                 </td>
                 <td>{u.email}</td>
                 <td>{u.role}</td>

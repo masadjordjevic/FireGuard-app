@@ -18,10 +18,14 @@ export function isAdmin(role: string | undefined | null): boolean {
   return !!role && (ADMIN_ROLES as readonly string[]).includes(role);
 }
 
-const HIGH_TRUST_ROLES = ["EMERGENCY_SERVICE", "VALIDATOR"];
+export const HIGH_TRUST_ROLES = ["EMERGENCY_SERVICE", "VALIDATOR"];
+
+export function isHighTrust(role: string | undefined | null): boolean {
+  return !!role && HIGH_TRUST_ROLES.includes(role);
+}
 
 export function isElevatedRole(role: string | undefined | null): boolean {
-  return !!role && (isAdmin(role) || HIGH_TRUST_ROLES.includes(role));
+  return !!role && (isAdmin(role) || isHighTrust(role));
 }
 
 // Display-only: "EMERGENCY_SERVICE" -> "Emergency Service". The stored value

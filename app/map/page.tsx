@@ -64,7 +64,7 @@ export default async function MapPage() {
             <p style={{ fontSize: "0.9rem", color: "var(--smoke)" }}>{inc.description}</p>
             <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
               Reported by {inc.reportedBy.name}
-              <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
+              <VerifiedBadge verified={inc.reportedBy.emailVerified} />
             </p>
           </Link>
         ))}

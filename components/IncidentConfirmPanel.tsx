@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-const HIGH_TRUST_ROLES = ["EMERGENCY_SERVICE", "VALIDATOR"];
+import { isHighTrust } from "@/lib/roles";
 
 export default function IncidentConfirmPanel({ incidentId }: { incidentId: string }) {
   const { data: session, status } = useSession();
@@ -31,7 +30,7 @@ export default function IncidentConfirmPanel({ incidentId }: { incidentId: strin
 
   if (status === "loading") return null;
 
-  if (!session || !HIGH_TRUST_ROLES.includes(session.user.role)) {
+  if (!session || !isHighTrust(session.user.role)) {
     return (
       <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
         Only Emergency Service or Validator accounts can issue an official high-trust confirmation.

@@ -40,9 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Menu size={24} />
             </label>
             <nav>
-              <Link href="/map">Map</Link>
-              <Link href="/report">Report Fire</Link>
-              <Link href="/volunteers">Volunteer Hub</Link>
+              <Link href="/map">Live Map</Link>
+              <Link href="/report">Report</Link>
+              <Link href="/volunteers">Volunteers</Link>
               <Link href="/campaigns">Donate</Link>
               <NavAuth />
             </nav>

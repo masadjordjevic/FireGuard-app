@@ -13,7 +13,7 @@ type Action = {
   description: string;
   location: string;
   neededSkills: string | null;
-  createdBy: { name: string; didIdentifier: string | null };
+  createdBy: { name: string; emailVerified: boolean };
   signups: { id: string; userId: string }[];
 };
 
@@ -76,7 +76,7 @@ export default function VolunteerHub() {
               )}
               <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
                 {a.signups.length} volunteer(s) signed up · by {a.createdBy.name}
-                <VerifiedBadge didIdentifier={a.createdBy.didIdentifier} />
+                <VerifiedBadge verified={a.createdBy.emailVerified} />
               </p>
               <ActionSignupPanel actionId={a.id} initiallySignedUp={mine} />
               <p style={{ marginTop: 8 }}>

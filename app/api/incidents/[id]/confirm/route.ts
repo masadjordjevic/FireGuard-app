@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isHighTrust } from "@/lib/roles";
 
-const HIGH_TRUST_ROLES = ["EMERGENCY_SERVICE", "VALIDATOR"];
 const HIGH_TRUST_LEVEL = 3; // above the default trustLevel of 1 for an ordinary confirmation
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   // session (resolved server-side from the DB via the JWT), never from
   // client input — a client-supplied role field was exactly the insecure
   // shortcut this endpoint replaces.
-  if (!HIGH_TRUST_ROLES.includes(session.user.role)) {
+  if (!isHighTrust(session.user.role)) {
     return NextResponse.json(
       { error: "Only Emergency Service or Validator accounts can issue a high-trust confirmation" },
       { status: 403 }

@@ -1,12 +1,24 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { isAdmin, isElevatedRole, formatRole } from "@/lib/roles";
-import RoleIcon from "@/components/RoleIcon";
+import { isAdmin, formatRole } from "@/lib/roles";
 
 export default function NavAuth() {
   const { data: session, status } = useSession();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   if (status === "loading") return null;
 
@@ -23,24 +35,31 @@ export default function NavAuth() {
     );
   }
 
+  const initial = session.user.name?.charAt(0).toUpperCase() ?? "?";
+
   return (
-    <>
-      <Link href="/profile">Profile</Link>
-      {isAdmin(session.user.role) && <Link href="/admin">Admin</Link>}
-      <span className="nav-user">
-        {session.user.name}
-        <span className={`role-chip ${isElevatedRole(session.user.role) ? "role-chip-elevated" : ""}`}>
-          <RoleIcon role={session.user.role} />
-          {formatRole(session.user.role)}
-        </span>
-      </span>
-      <button
-        className="btn"
-        style={{ padding: "4px 12px", fontSize: "0.85rem" }}
-        onClick={() => signOut({ callbackUrl: "/" })}
-      >
-        Log out
+    <div className="nav-user-menu" ref={menuRef}>
+      <button className="nav-avatar" onClick={() => setOpen((o) => !o)} aria-label="Account menu">
+        {initial}
       </button>
-    </>
+      {open && (
+        <div className="nav-dropdown">
+          <div className="nav-dropdown-header">
+            {session.user.name} · {formatRole(session.user.role)}
+          </div>
+          <Link href="/profile" className="nav-dropdown-item" onClick={() => setOpen(false)}>
+            Profile
+          </Link>
+          {isAdmin(session.user.role) && (
+            <Link href="/admin" className="nav-dropdown-item" onClick={() => setOpen(false)}>
+              Admin
+            </Link>
+          )}
+          <button className="nav-dropdown-item" onClick={() => signOut({ callbackUrl: "/" })}>
+            Log out
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

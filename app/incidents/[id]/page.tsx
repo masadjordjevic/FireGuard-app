@@ -6,6 +6,7 @@ import { MapPin } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import StatusBadge from "@/components/StatusBadge";
 import IncidentConfirmPanel from "@/components/IncidentConfirmPanel";
+import IncidentAgentPanel from "@/components/IncidentAgentPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +69,7 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
 
         <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
           Reported by {incident.reportedBy.name}
-          <VerifiedBadge didIdentifier={incident.reportedBy.didIdentifier} /> on{" "}
+          <VerifiedBadge verified={incident.reportedBy.emailVerified} /> on{" "}
           {new Date(incident.createdAt).toLocaleString()}
         </p>
       </div>
@@ -76,6 +77,11 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
       <div className="card">
         <h2>Confirm this incident</h2>
         <IncidentConfirmPanel incidentId={incident.id} />
+      </div>
+
+      <div className="card">
+        <h2>AI Triage Assistant</h2>
+        <IncidentAgentPanel incidentId={incident.id} currentStatus={incident.status} />
       </div>
 
       <div className="card">
@@ -87,7 +93,7 @@ export default async function IncidentDetailPage({ params }: { params: { id: str
             {incident.confirmations.map((c) => (
               <li key={c.id} style={{ marginBottom: 6 }}>
                 <strong>{c.user.name}</strong>
-                <VerifiedBadge didIdentifier={c.user.didIdentifier} />{" "}
+                <VerifiedBadge verified={c.user.emailVerified} />{" "}
                 <span style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>
                   ({c.user.role}, trust level {c.trustLevel}) — {new Date(c.createdAt).toLocaleString()}
                 </span>

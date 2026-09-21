@@ -47,7 +47,7 @@ export default async function ActionDetailPage({ params }: { params: { id: strin
         )}
         <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
           Created by {action.createdBy.name}
-          <VerifiedBadge didIdentifier={action.createdBy.didIdentifier} />
+          <VerifiedBadge verified={action.createdBy.emailVerified} />
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default async function ActionDetailPage({ params }: { params: { id: strin
             {action.signups.map((s) => (
               <li key={s.id} style={{ marginBottom: 6 }}>
                 <strong>{s.user.name}</strong>
-                <VerifiedBadge didIdentifier={s.user.didIdentifier} />
+                <VerifiedBadge verified={s.user.emailVerified} />
                 {s.skills && <span style={{ fontSize: "0.85rem", color: "var(--smoke)" }}> — {s.skills}</span>}
               </li>
             ))}

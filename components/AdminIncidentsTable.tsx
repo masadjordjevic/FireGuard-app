@@ -11,7 +11,7 @@ type Incident = {
   status: string;
   latitude: number;
   longitude: number;
-  reportedBy: { name: string; didIdentifier: string | null };
+  reportedBy: { name: string; emailVerified: boolean };
 };
 
 export default function AdminIncidentsTable({ incidents: initial }: { incidents: Incident[] }) {
@@ -59,7 +59,7 @@ export default function AdminIncidentsTable({ incidents: initial }: { incidents:
               </td>
               <td>
                 {inc.reportedBy.name}
-                <VerifiedBadge didIdentifier={inc.reportedBy.didIdentifier} />
+                <VerifiedBadge verified={inc.reportedBy.emailVerified} />
               </td>
               <td>
                 <span style={{ marginRight: 8, display: "inline-block" }}>

@@ -53,9 +53,16 @@ export async function PATCH(req: NextRequest) {
   const canSelfEditRole = (SELF_SERVICE_ROLES as readonly string[]).includes(current.role);
   const roleToApply = canSelfEditRole && role ? role : current.role;
 
+  // didIdentifier is no longer edited from the profile UI (replaced by email
+  // verification) but the field stays dormant in the schema — only touch it
+  // if a caller explicitly sends it, so old values aren't silently wiped.
   const user = await prisma.user.update({
     where: { id: session.user.id },
-    data: { name, role: roleToApply, didIdentifier: didIdentifier || null },
+    data: {
+      name,
+      role: roleToApply,
+      ...(didIdentifier !== undefined ? { didIdentifier: didIdentifier || null } : {}),
+    },
     select: publicUserSelect,
   });
 

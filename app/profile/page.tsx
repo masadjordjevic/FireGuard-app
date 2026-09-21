@@ -18,9 +18,13 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  const [didIdentifier, setDidIdentifier] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [verificationRequestedAt, setVerificationRequestedAt] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+
+  const [verifyBusy, setVerifyBusy] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (sessionStatus === "authenticated") loadProfile();
@@ -37,7 +41,8 @@ export default function ProfilePage() {
       setEmail(user.email);
       setName(user.name);
       setRole(user.role);
-      setDidIdentifier(user.didIdentifier ?? "");
+      setEmailVerified(user.emailVerified);
+      setVerificationRequestedAt(user.verificationRequestedAt);
       setStatus("loaded");
     } catch (err: any) {
       setError(err.message);
@@ -50,7 +55,7 @@ export default function ProfilePage() {
     setStatus("saving");
     setError(null);
     try {
-      const body: Record<string, string> = { name, didIdentifier };
+      const body: Record<string, string> = { name };
       if (isSelfServiceRole(role)) body.role = role;
 
       const res = await fetch("/api/users/me", {
@@ -75,6 +80,21 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleRequestVerification() {
+    setVerifyBusy(true);
+    setVerifyError(null);
+    try {
+      const res = await fetch("/api/profile/request-verification", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to request verification");
+      setVerificationRequestedAt(data.verificationRequestedAt);
+    } catch (err: any) {
+      setVerifyError(err.message);
+    } finally {
+      setVerifyBusy(false);
+    }
+  }
+
   if (sessionStatus === "loading") {
     return <p style={{ color: "var(--smoke)" }}>Loading...</p>;
   }
@@ -92,58 +112,68 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="card" style={{ maxWidth: 560, margin: "0 auto" }}>
-      <h1>My Profile</h1>
-      <p style={{ color: "var(--smoke)", fontSize: "0.9rem" }}>
-        Add your Decentralized Identifier (DID) below to show a "Verified" badge next to your name
-        across the app.
-      </p>
+    <div style={{ maxWidth: 560, margin: "0 auto" }}>
+      <div className="card">
+        <h1>My Profile</h1>
 
-      <form onSubmit={handleSave} style={{ marginTop: 16 }}>
-        <label>
-          Email
-          <input value={email} disabled />
-        </label>
-        {isSelfServiceRole(role) ? (
+        <form onSubmit={handleSave} style={{ marginTop: 16 }}>
           <label>
-            <RoleIcon role={role} /> Role
-            <select value={role} onChange={(e) => setRole(e.target.value)}>
-              {SELF_SERVICE_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+            Email
+            <input value={email} disabled />
           </label>
-        ) : (
+          {isSelfServiceRole(role) ? (
+            <label>
+              <RoleIcon role={role} /> Role
+              <select value={role} onChange={(e) => setRole(e.target.value)}>
+                {SELF_SERVICE_ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <label>
+              <RoleIcon role={role} /> Role
+              <input value={role} disabled />
+              <span style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>
+                Elevated role — contact an administrator to change it.
+              </span>
+            </label>
+          )}
           <label>
-            <RoleIcon role={role} /> Role
-            <input value={role} disabled />
-            <span style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>
-              Elevated role — contact an administrator to change it.
-            </span>
+            Name
+            <input required value={name} onChange={(e) => setName(e.target.value)} />
           </label>
-        )}
-        <label>
-          Name
-          <input required value={name} onChange={(e) => setName(e.target.value)} />
-        </label>
-        <label>
-          DID identifier (optional)
-          <input
-            value={didIdentifier}
-            onChange={(e) => setDidIdentifier(e.target.value)}
-            placeholder="did:ethr:0x... or did:ens:yourname.eth"
-          />
-        </label>
-        <p style={{ fontSize: "0.8rem", color: "var(--smoke)" }}>
-          Status: {didIdentifier ? <VerifiedBadge didIdentifier={didIdentifier} /> : "Not verified"}
+          {error && <p style={{ color: "crimson" }}>{error}</p>}
+          <button className="btn" type="submit" disabled={status === "saving" || status === "loading"}>
+            {status === "saving" ? "Saving..." : "Save profile"}
+          </button>
+        </form>
+      </div>
+
+      <div className="card">
+        <h2>Verification</h2>
+        <p style={{ fontSize: "0.85rem", color: "var(--smoke)" }}>
+          Optional — shows a "Verified" badge next to your name across the app. Reviewed manually
+          by an admin. Never affects login or anything else.
         </p>
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
-        <button className="btn" type="submit" disabled={status === "saving" || status === "loading"}>
-          {status === "saving" ? "Saving..." : "Save profile"}
-        </button>
-      </form>
+
+        {emailVerified ? (
+          <p style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            You're verified. <VerifiedBadge verified />
+          </p>
+        ) : verificationRequestedAt ? (
+          <span className="status-badge status-REPORTED">Verification pending</span>
+        ) : (
+          <>
+            <button className="btn" onClick={handleRequestVerification} disabled={verifyBusy}>
+              {verifyBusy ? "Requesting..." : "Request Verification"}
+            </button>
+            {verifyError && <p style={{ color: "crimson", fontSize: "0.85rem", marginTop: 8 }}>{verifyError}</p>}
+          </>
+        )}
+      </div>
     </div>
   );
 }

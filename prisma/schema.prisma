@@ -36,13 +36,18 @@ model User {
   role          String   @default("CITIZEN")
   reputation    Int      @default(0)
   walletAddress String?
-  // MVP-only Decentralized Identity field: a self-reported DID string (e.g.
-  // "did:ethr:0x..." or "did:ens:name.eth"). Presence of this field is used as
-  // a stand-in "Verified" signal in the UI. It is NOT cryptographically
-  // checked — see lib/did.ts for the production note on wiring in a real
-  // DID resolver (e.g. ethr-did / did-resolver, or ENS resolution).
+  // MVP-only Decentralized Identity field: a self-reported DID string. No
+  // longer surfaced in the UI — the "Verified" badge is now driven by
+  // emailVerified below. Left in place (dormant) rather than dropped, since
+  // removing it wasn't asked for and it's a non-destructive column to leave.
   didIdentifier String?
-  createdAt     DateTime @default(now())
+  // Verification — optional, cosmetic only: never blocks login or any other
+  // functionality, just controls whether the "Verified" badge shows. Approved
+  // manually by an admin (see /admin "Pending Verifications" and
+  // POST /api/admin/verify-user/[id]) rather than via an email provider.
+  emailVerified           Boolean   @default(false)
+  verificationRequestedAt DateTime?
+  createdAt               DateTime  @default(now())
 
   incidents       Incident[]        @relation("ReportedBy")
   confirmations   Confirmation[]

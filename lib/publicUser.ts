@@ -12,5 +12,7 @@ export const publicUserSelect = {
   reputation: true,
   walletAddress: true,
   didIdentifier: true,
+  emailVerified: true,
+  verificationRequestedAt: true,
   createdAt: true,
 } as const;
