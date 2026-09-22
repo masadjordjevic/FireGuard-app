@@ -34,7 +34,7 @@ function FitToIncidents({ incidents }: { incidents: Incident[] }) {
   useEffect(() => {
     if (incidents.length === 0) return;
     const bounds = L.latLngBounds(incidents.map((inc) => [inc.latitude, inc.longitude] as [number, number]));
-    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 11 });
   }, [map, incidents]);
 
   return null;
@@ -46,25 +46,30 @@ export default function IncidentMap({ incidents }: { incidents: Incident[] }) {
     incidents.length > 0 ? [incidents[0].latitude, incidents[0].longitude] : [44.7866, 20.4489]; // default: Belgrade
 
   return (
-    <MapContainer center={center} zoom={7} style={{ height: "500px", width: "100%", borderRadius: 12 }}>
-      <FitToIncidents incidents={incidents} />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {incidents.map((inc) => (
-        <Marker
-          key={inc.id}
-          position={[inc.latitude, inc.longitude]}
-          icon={icon}
-          eventHandlers={{ click: () => router.push(`/incidents/${inc.id}`) }}
-        >
-          <Tooltip>
-            {inc.title} — {inc.status}
-            {inc.riskLevel && ` — Risk: ${inc.riskLevel}`}
-          </Tooltip>
-        </Marker>
-      ))}
-    </MapContainer>
+    // Wrapper (not the MapContainer itself) owns the rounded corners + clipping,
+    // since Leaflet repositions internal panes with CSS transforms that can
+    // otherwise render past a border-radius applied directly to the map root.
+    <div className="incident-map-wrap">
+      <MapContainer center={center} zoom={7} style={{ height: "100%", width: "100%" }}>
+        <FitToIncidents incidents={incidents} />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {incidents.map((inc) => (
+          <Marker
+            key={inc.id}
+            position={[inc.latitude, inc.longitude]}
+            icon={icon}
+            eventHandlers={{ click: () => router.push(`/incidents/${inc.id}`) }}
+          >
+            <Tooltip>
+              {inc.title} — {inc.status}
+              {inc.riskLevel && ` — Risk: ${inc.riskLevel}`}
+            </Tooltip>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 }

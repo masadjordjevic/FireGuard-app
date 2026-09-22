@@ -359,6 +359,19 @@ form select {
   color: #1864ab;
 }
 
+.incident-map-wrap {
+  height: 500px;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .incident-map-wrap {
+    height: 320px;
+  }
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
